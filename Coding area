@@ -1,0 +1,9 @@
+# Budgeting & Expense Tracking System
+
+A C++ program that tracks income and expenses.
+
+## Features
+- Add income
+- Add expenses
+- View transactions
+- Calculate balance
