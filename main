@@ -1,0 +1,152 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <iomanip>
+using namespace std;
+
+struct Transaction {
+    string type;
+    string category;
+    string description;
+    double amount;
+};
+
+vector<Transaction> transactions;
+
+void saveData() {
+    ofstream file("transactions.txt");
+
+    for (auto t : transactions) {
+        file << t.type << "|"
+             << t.category << "|"
+             << t.description << "|"
+             << t.amount << endl;
+    }
+
+    file.close();
+}
+
+void loadData() {
+    ifstream file("transactions.txt");
+
+    if (!file)
+        return;
+
+    Transaction t;
+    string amount;
+
+    while (getline(file, t.type, '|')) {
+        getline(file, t.category, '|');
+        getline(file, t.description, '|');
+        getline(file, amount);
+
+        t.amount = stod(amount);
+        transactions.push_back(t);
+    }
+
+    file.close();
+}
+
+void addTransaction() {
+    Transaction t;
+
+    cout << "\nEnter Type (Income/Expense): ";
+    cin >> t.type;
+
+    cout << "Enter Category: ";
+    cin >> t.category;
+
+    cout << "Enter Description: ";
+    cin.ignore();
+    getline(cin, t.description);
+
+    cout << "Enter Amount: ";
+    cin >> t.amount;
+
+    transactions.push_back(t);
+    saveData();
+
+    cout << "\nTransaction added successfully!\n";
+}
+
+void viewTransactions() {
+    cout << "\n===== TRANSACTIONS =====\n";
+
+    if (transactions.empty()) {
+        cout << "No transactions found.\n";
+        return;
+    }
+
+    for (int i = 0; i < transactions.size(); i++) {
+        cout << i + 1 << ". "
+             << transactions[i].type << " | "
+             << transactions[i].category << " | "
+             << transactions[i].description
+             << " | ₱"
+             << fixed << setprecision(2)
+             << transactions[i].amount << endl;
+    }
+}
+
+void showBalance() {
+    double income = 0;
+    double expense = 0;
+
+    for (auto t : transactions) {
+        if (t.type == "Income")
+            income += t.amount;
+        else if (t.type == "Expense")
+            expense += t.amount;
+    }
+
+    cout << "\n===== BALANCE =====\n";
+    cout << "Total Income: ₱" << income << endl;
+    cout << "Total Expense: ₱" << expense << endl;
+    cout << "Remaining Balance: ₱"
+         << income - expense << endl;
+}
+
+int main() {
+
+    loadData();
+
+    int choice;
+
+    do {
+        cout << "\n============================";
+        cout << "\n BUDGETING & EXPENSE TRACKER";
+        cout << "\n============================";
+        cout << "\n1. Add Transaction";
+        cout << "\n2. View Transactions";
+        cout << "\n3. Show Balance";
+        cout << "\n4. Exit";
+
+        cout << "\nChoose: ";
+        cin >> choice;
+
+        switch(choice) {
+
+            case 1:
+                addTransaction();
+                break;
+
+            case 2:
+                viewTransactions();
+                break;
+
+            case 3:
+                showBalance();
+                break;
+
+            case 4:
+                cout << "Goodbye!";
+                break;
+
+            default:
+                cout << "Invalid choice!";
+        }
+
+    } while(choice != 4);
+
+    return 0;
+}
